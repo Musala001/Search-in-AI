@@ -1,38 +1,106 @@
 #include <iostream>
 #include <queue>
-#include <unordered_set>
+#include <unordered_map>
 #include <string>
 using namespace std;
 
 int main() {
     string start;
-    cin >> start;
+    if (!(cin >> start)) return 0;
     string goal = "ABCDEFGHIJKLMNO#";
+    if (start == goal) { cout << 0 << endl; return 0; }
 
-    queue<pair<string,int>> q;
-    unordered_set<string> visited;
+    unordered_map<string,int> d1, d2;
+    queue<string> q1, q2;
+    d1[start] = 0; q1.push(start);
+    d2[goal] = 0;  q2.push(goal);
 
-    q.push({start, 0});
-    visited.insert(start);
-
-    while (!q.empty()) {
-        auto [cur, dist] = q.front();
-        q.pop();
-
-        if (cur == goal) {
-            cout << dist << endl;
-            break;
+    while (!q1.empty() && !q2.empty()) {
+        if (q1.size() <= q2.size()) {
+            int sz = q1.size();
+            while (sz--) {
+                string cur = q1.front(); q1.pop();
+                int dist = d1[cur];
+                int pos;
+                for (int i = 0; i < 16; ++i) if (cur[i] == '#') pos = i;
+                int r = pos / 4, c = pos % 4;
+                if (r > 0) {
+                    string nb = cur; swap(nb[pos], nb[pos-4]);
+                    if (!d1.count(nb)) {
+                        d1[nb] = dist + 1;
+                        if (d2.count(nb)) { cout << d1[nb] + d2[nb] << endl; return 0; }
+                        q1.push(nb);
+                    }
+                }
+                if (r < 3) {
+                    string nb = cur; swap(nb[pos], nb[pos+4]);
+                    if (!d1.count(nb)) {
+                        d1[nb] = dist + 1;
+                        if (d2.count(nb)) { cout << d1[nb] + d2[nb] << endl; return 0; }
+                        q1.push(nb);
+                    }
+                }
+                if (c > 0) {
+                    string nb = cur; swap(nb[pos], nb[pos-1]);
+                    if (!d1.count(nb)) {
+                        d1[nb] = dist + 1;
+                        if (d2.count(nb)) { cout << d1[nb] + d2[nb] << endl; return 0; }
+                        q1.push(nb);
+                    }
+                }
+                if (c < 3) {
+                    string nb = cur; swap(nb[pos], nb[pos+1]);
+                    if (!d1.count(nb)) {
+                        d1[nb] = dist + 1;
+                        if (d2.count(nb)) { cout << d1[nb] + d2[nb] << endl; return 0; }
+                        q1.push(nb);
+                    }
+                }
+            }
+        } else {
+            int sz = q2.size();
+            while (sz--) {
+                string cur = q2.front(); q2.pop();
+                int dist = d2[cur];
+                int pos;
+                for (int i = 0; i < 16; ++i) if (cur[i] == '#') pos = i;
+                int r = pos / 4, c = pos % 4;
+                if (r > 0) {
+                    string nb = cur; swap(nb[pos], nb[pos-4]);
+                    if (!d2.count(nb)) {
+                        d2[nb] = dist + 1;
+                        if (d1.count(nb)) { cout << d1[nb] + d2[nb] << endl; return 0; }
+                        q2.push(nb);
+                    }
+                }
+                if (r < 3) {
+                    string nb = cur; swap(nb[pos], nb[pos+4]);
+                    if (!d2.count(nb)) {
+                        d2[nb] = dist + 1;
+                        if (d1.count(nb)) { cout << d1[nb] + d2[nb] << endl; return 0; }
+                        q2.push(nb);
+                    }
+                }
+                if (c > 0) {
+                    string nb = cur; swap(nb[pos], nb[pos-1]);
+                    if (!d2.count(nb)) {
+                        d2[nb] = dist + 1;
+                        if (d1.count(nb)) { cout << d1[nb] + d2[nb] << endl; return 0; }
+                        q2.push(nb);
+                    }
+                }
+                if (c < 3) {
+                    string nb = cur; swap(nb[pos], nb[pos+1]);
+                    if (!d2.count(nb)) {
+                        d2[nb] = dist + 1;
+                        if (d1.count(nb)) { cout << d1[nb] + d2[nb] << endl; return 0; }
+                        q2.push(nb);
+                    }
+                }
+            }
         }
-
-        int pos;
-        for (int i = 0; i < 16; i++) if (cur[i] == '#') pos = i;
-        int row = pos / 4, col = pos % 4;
-
-        if (row > 0) { string up = cur; swap(up[pos], up[pos-4]); if (!visited.count(up)) { visited.insert(up); q.push({up, dist+1}); } }
-        if (row < 3) { string down = cur; swap(down[pos], down[pos+4]); if (!visited.count(down)) { visited.insert(down); q.push({down, dist+1}); } }
-        if (col > 0) { string left = cur; swap(left[pos], left[pos-1]); if (!visited.count(left)) { visited.insert(left); q.push({left, dist+1}); } }
-        if (col < 3) { string right = cur; swap(right[pos], right[pos+1]); if (!visited.count(right)) { visited.insert(right); q.push({right, dist+1}); } }
     }
 
+    cout << -1 << endl;
     return 0;
 }
